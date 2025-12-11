@@ -14,12 +14,13 @@ The environment can be created and activated using the following commands:
 awk -F '\t' 'NR==1{
     # 找列号
     for(i=1;i<=NF;i++){
-        if($i=="strain") s=i
-        if($i=="group")  g=i
-        if($i=="region") r=i
+        if($i=="strain")          s=i
+        if($i=="group")           g=i
+        if($i=="region")          r=i
+        if($i=="Collection_date") d=i
     }
     # 输出表头
-    print "strain\tcountry\tgroup\tcontinent"
+    print "strain\tcountry\tgroup\tcontinent\tTime"
     next
 }
 {
@@ -29,17 +30,17 @@ awk -F '\t' 'NR==1{
 
     n = split(full, a, " / ")
 
-    if (n >= 1) {
-        continent = a[1]    # "Asia"
-    }
-    if (n >= 2) {
-        country = a[2]      # "China"
-    } else if (n == 1) {
-        country = a[1]
-    }
+    if (n >= 1) continent = a[1]   # "Asia"
+    if (n >= 2) country = a[2]     # "China"
+    else if (n == 1) country = a[1]
 
-    print $s "\t" country "\t" $g "\t" continent
-}' metadata_chikv_rr.tsv > metadata_chikv_strain_country_group_continent.tsv
+    # 从 Collection_date 取年份：前4个字符
+    time = substr($d, 1, 4)
+
+    print $s "\t" country "\t" $g "\t" continent "\t" time
+}' /scr/u/dongw21/Chikungunya/chikv_ALL/metadata_chikv_rr.tsv \
+> metadata_chikv_strain_country_group_continent_time.tsv
+
 
 
 
