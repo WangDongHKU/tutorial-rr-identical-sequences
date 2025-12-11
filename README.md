@@ -22,7 +22,7 @@ awk -F '\t' 'NR==1{
     next
 }
 $g=="III-Asian"{print $s}' metadata_chikv_rr.tsv \
-  > chikv_III_Asian_ids.txt
+  > /scr/u/dongw21/Chikungunya/strains_III_Asian.txt
 
 awk 'NR==FNR{
         ids[$1]=1; 
@@ -37,7 +37,7 @@ awk 'NR==FNR{
         if(keep) print
      }
 ' chikv_III_Asian_ids.txt \
- /scr/u/dongw21/Chikungunya/chikv_aln.fasta \
+ /scr/u/dongw21/Chikungunya/chikv_aln1.fasta\
   > /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta
 ```
 
