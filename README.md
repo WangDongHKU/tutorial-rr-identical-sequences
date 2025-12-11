@@ -32,7 +32,7 @@ awk '/^>/{                     # 如果是 header 行
         next
      }
      { print }                 # 非 header 行直接输出（序列）
-' /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta
+' /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln1.fasta
 ```
 
 
@@ -46,7 +46,7 @@ awk '/^>/{                     # 如果是 header 行
         next
      }
      { print }                 # 非 header 行直接输出（序列）
-' /scr/u/dongw21/Chikungunya/chikv_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_aln.fasta
+' /scr/u/dongw21/Chikungunya/chikv_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_aln1.fasta
 ```
 
 
@@ -61,7 +61,7 @@ awk '/^>/{                     # 如果是 header 行
         next
      }
      { print }                 # 非 header 行直接输出（序列）
-' /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta
+' /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln1.fasta
 ```
 
 
