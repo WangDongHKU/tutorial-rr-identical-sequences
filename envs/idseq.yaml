@@ -4,6 +4,7 @@ channels:
   - defaults
   - bioconda
 dependencies:
+  - python=3.8
   - tsv-utils
   - pairsnp
   - r-base=4.3.3
