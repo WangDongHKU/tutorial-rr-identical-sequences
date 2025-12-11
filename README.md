@@ -145,7 +145,7 @@ conda env remove --name idseq
 [**pairsnp**](https://github.com/gtonkinhill/pairsnp) can be used to compute a pairwise distance matrix from aligned sequences
 ```bash
 # 重新写入正确的表头（注意 -e）
-echo -e "strain_1\t strain_1\tn_mutations" > results/df_genetic_distance.tsv
+echo -e "strain_1\tstrain_1\tn_mutations" > results/df_genetic_distance.tsv
 # 追加 pairsnp 的输出
 pairsnp -s /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta >> /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_genetic_distance.tsv
 ```
