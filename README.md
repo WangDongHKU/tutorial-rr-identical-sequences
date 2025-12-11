@@ -29,10 +29,10 @@ conda env remove --name idseq
 ### 1. Computing pairwise distance matrices within a fasta file
 [**pairsnp**](https://github.com/gtonkinhill/pairsnp) can be used to compute a pairwise distance matrix from aligned sequences
 ```bash
-# Creating header in the output file
-echo "strain_1\tstrain_2\tn_mutations" > "results/df_genetic_distance.tsv"
-# Generating pairwise distance matrix
-pairsnp -s "data/synthetic-fasta.fasta" >> "results/df_genetic_distance.tsv"
+# 重新写入正确的表头（注意 -e）
+echo -e "strain_1\tstrain_2\tn_mutations" > results/df_genetic_distance.tsv
+# 追加 pairsnp 的输出
+pairsnp -s data/synthetic-fasta.fasta >> results/df_genetic_distance.tsv
 ```
 
 ### 2. Downsampling the distance matrix only to pairs of identical sequences
