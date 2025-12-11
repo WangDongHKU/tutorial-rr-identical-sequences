@@ -186,7 +186,7 @@ A typical valid metadata file should have the following structure:
     --input_metadata /scr/u/dongw21/Chikungunya/chikv_ALL/metadata_chikv_strain_country_group.tsv\
     --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq.tsv \
     --output /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq_with_metadata.tsv \
-    --metadata_field region group      
+    --metadata_field country group  continent     
 ```
 
 ### 4. Generating a dataframe with counts of pairs of identical sequences by group
@@ -196,18 +196,34 @@ For this to work well, the metadata column **--metadata_field** shoudl have been
 ```bash
 /scr/u/dongw21/Chikungunya/chikv_ALL/scripts/count_pairs.R \
     --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq_with_metadata.tsv \
-    --metadata_field region \
-    --output_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_region.tsv
+    --metadata_field continent \
+    --output_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_continent.tsv
 ```
+
+```bash
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/count_pairs.R \
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq_with_metadata.tsv \
+    --metadata_field country \
+    --output_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_country.tsv
+```
+
 
 ### 5. Computing the relative risk of observing identical sequences between groups from a dataframe containing the number of pairs of identical sequences between groups
 ```RR_from_df_n_pairs.R``` then enables to compute the relative risk of observing pairs of identical sequences between groups (indicated by the **--metadata_field** flag) by inputting a dataframe obtained from ```count_pairs.R```.
 
 ```bash
 /scr/u/dongw21/Chikungunya/chikv_ALL/scripts/RR_from_df_n_pairs.R \
-  --input_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_region.tsv \
-  --metadata_field region \
-  --output_df_RR /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_RR_by_region.tsv
+  --input_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_continent.tsv \
+  --metadata_field continent \
+  --output_df_RR /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_RR_by_continent.tsv
+```
+
+
+```bash
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/RR_from_df_n_pairs.R \
+  --input_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_country.tsv \
+  --metadata_field country \
+  --output_df_RR /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_RR_by_country.tsv
 ```
 
 ### 6. Compute uncertainty around RR using a resampling approach
@@ -238,15 +254,35 @@ The output has the following format:
     --n_subsamples 1000 \
     --prop_subsample 0.8 \
     --temp_dir temp \
-    --metadata_field region \
-    --output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_region.tsv
+    --metadata_field country \
+    --output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_country.tsv
+```
+
+
+```bash
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/uncertainty_RR.R \
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq.tsv \
+    --input_metadata /scr/u/dongw21/Chikungunya/chikv_ALL/metadata_chikv_strain_country_group.tsv \
+    --n_subsamples 1000 \
+    --prop_subsample 0.8 \
+    --temp_dir temp \
+    --metadata_field continent \
+    --output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_continent.tsv
 ```
 
 Median values along 95% confidence intervals can then be obtained by computing the median and 2.5% and 97.5% quantiles across ```replicate_id``` using a standard data analysis software (R, Python...) or the following ```tsv-summarize``` command: 
 
 ```bash
 tsv-summarize -H \
-    --group-by region_1,region_2 \
+    --group-by country_1,country_2 \
     --quantile RR:0.025,0.5,0.975 \
-    output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_region.tsv
+    output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_country.tsv
+```
+
+
+```bash
+tsv-summarize -H \
+    --group-by continent_1,continent_2 \
+    --quantile RR:0.025,0.5,0.975 \
+    output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_continent.tsv
 ```
