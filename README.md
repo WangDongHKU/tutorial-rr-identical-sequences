@@ -9,8 +9,40 @@ To do so, the strategy has been to use [pairsnp](https://github.com/gtonkinhill/
 We use conda to define an environment containing all the required depencencies.
 We can then use conda to install the required dependencies.
 The environment can be created and activated using the following commands:
-```bash
 
+
+
+
+```bash
+awk -F '\t' 'NR==1{
+    for(i=1;i<=NF;i++){
+        if($i=="genotype") g=i
+        if($i=="strain")   s=i   # 如果 ID 列不是 strain，就改成真实列名
+    }
+    next
+}
+$g=="III-Asian"{print $s}' metadata_chikv_rr.tsv \
+  > chikv_III_Asian_ids.txt
+
+awk 'NR==FNR{
+        ids[$1]=1; 
+        next
+     }
+     /^>/{
+        header=$0
+        id=substr($0,2)
+        keep = (id in ids)
+     }
+     {
+        if(keep) print
+     }
+' chikv_III_Asian_ids.txt \
+ /scr/u/dongw21/Chikungunya/chikv_aln.fasta \
+  > /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta
+```
+
+
+```bash
 awk '/^>/{                     # 如果是 header 行
         split($0, a, "|");     # 按 | 拆分
         # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
@@ -37,16 +69,15 @@ awk '/^>/{                     # 如果是 header 行
 
 
 ```bash
-
-awk '/^>/{                     # 如果是 header 行
-        split($0, a, "|");     # 按 | 拆分
-        # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
+awk '/^>/{                     
+        split($0, a, "|");     
         split(a[2], b, ">"); 
-        print ">" b[length(b)] # 打印新的 header：>EPI_ISL_XXXX
+        print ">" b[length(b)]
         next
      }
-     { print }                 # 非 header 行直接输出（序列）
-' /scr/u/dongw21/Chikungunya/chikv_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_aln1.fasta
+     { print }
+' /scr/u/dongw21/Chikungunya/chikv_aln.fasta \
+  > /scr/u/dongw21/Chikungunya/chikv_aln1.fasta
 ```
 
 
@@ -61,7 +92,8 @@ awk '/^>/{                     # 如果是 header 行
         next
      }
      { print }                 # 非 header 行直接输出（序列）
-' /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln1.fasta
+' /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta >
+/scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln1.fasta
 ```
 
 
@@ -85,9 +117,9 @@ conda env remove --name idseq
 [**pairsnp**](https://github.com/gtonkinhill/pairsnp) can be used to compute a pairwise distance matrix from aligned sequences
 ```bash
 # 重新写入正确的表头（注意 -e）
-echo -e "strain_1\tstrain_2\tn_mutations" > results/df_genetic_distance.tsv
+echo -e "strain_1\t strain_1\tn_mutations" > results/df_genetic_distance.tsv
 # 追加 pairsnp 的输出
-pairsnp -s data/synthetic-fasta.fasta >> results/df_genetic_distance.tsv
+pairsnp -s /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta >> results/df_genetic_distance.tsv
 ```
 
 ### 2. Downsampling the distance matrix only to pairs of identical sequences
@@ -118,9 +150,9 @@ A typical valid metadata file should have the following structure:
 
 ```bash
 scripts/append_metadata_field.R \
-    --input_metadata data/synthetic-metadata.tsv \
-    --input_df_id_seq results/df_pairs_id_seq.tsv \
-    --output results/df_pairs_id_seq_with_metadata.tsv \
+    --input_metadata /scr/u/dongw21/Chikungunya/metadata_chikv_rr.tsv\
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq.tsv \
+    --output /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq_with_metadata.tsv \
     --metadata_field group region       
 ```
 
