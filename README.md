@@ -9,6 +9,21 @@ To do so, the strategy has been to use [pairsnp](https://github.com/gtonkinhill/
 We use conda to define an environment containing all the required depencencies.
 We can then use conda to install the required dependencies.
 The environment can be created and activated using the following commands:
+```bash
+
+awk '/^>/{                     # 如果是 header 行
+        split($0, a, "|");     # 按 | 拆分
+        # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
+        split(a[2], b, ">"); 
+        print ">" b[length(b)] # 打印新的 header：>EPI_ISL_XXXX
+        next
+     }
+     { print }                 # 非 header 行直接输出（序列）
+' /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln1.fasta
+```
+
+
+
 
 ```bash
 # Install
