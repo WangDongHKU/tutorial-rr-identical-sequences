@@ -145,15 +145,15 @@ conda env remove --name idseq
 [**pairsnp**](https://github.com/gtonkinhill/pairsnp) can be used to compute a pairwise distance matrix from aligned sequences
 ```bash
 # 重新写入正确的表头（注意 -e）
-echo -e "strain_1\tstrain_1\tn_mutations" > results/df_genetic_distance.tsv
+echo -e "strain_1\tstrain_2\tn_mutations" > /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_genetic_distance.tsv
 # 追加 pairsnp 的输出
-pairsnp -s /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta >> /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_genetic_distance.tsv
+pairsnp -s /scr/u/dongw21/Chikungunya/chikv_ALL/chikv_II_ECSA_aln.fasta1.fasta >> /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_genetic_distance.tsv
 ```
 
 ### 2. Downsampling the distance matrix only to pairs of identical sequences
 [**tsv-filter**](https://github.com/eBay/tsv-utils/tree/master/tsv-filter) can be used to only keep pairs of sequences that are identical.
 ```bash
-tsv-filter -H --eq n_mutations:0 "/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_genetic_distance.tsv" > "/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq.tsv"
+tsv-filter -H --eq n_mutations:0 "/scr/u/dongw21/Chikungunya/chikv_ALL/results/df_genetic_distance.tsv" > "/scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq.tsv"
 ```
 
 Another option would have been to directly add the flag ```-t 0``` in the ```pairsnp``` command to only save pairs of sequences that are identical.
@@ -177,10 +177,10 @@ A typical valid metadata file should have the following structure:
 ... |
 
 ```bash
-/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/scripts/append_metadata_field.R \
-    --input_metadata /scr/u/dongw21/Chikungunya/metadata_chikv_strain_country_group.tsv\
-    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq.tsv \
-    --output /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq_with_metadata.tsv \
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/append_metadata_field.R \
+    --input_metadata /scr/u/dongw21/Chikungunya/chikv_ALL/metadata_chikv_strain_country_group.tsv\
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq.tsv \
+    --output /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq_with_metadata.tsv \
     --metadata_field region group      
 ```
 
@@ -189,20 +189,20 @@ A typical valid metadata file should have the following structure:
 For this to work well, the metadata column **--metadata_field** shoudl have been added in the ```append_metadata_field.R``` step above.
 
 ```bash
-scripts/count_pairs.R \
-    --input_df_id_seq results/df_pairs_id_seq_with_metadata.tsv \
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/count_pairs.R \
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq_with_metadata.tsv \
     --metadata_field region \
-    --output_df_pairs_count results/df_n_pairs_by_region.tsv
+    --output_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_region.tsv
 ```
 
 ### 5. Computing the relative risk of observing identical sequences between groups from a dataframe containing the number of pairs of identical sequences between groups
 ```RR_from_df_n_pairs.R``` then enables to compute the relative risk of observing pairs of identical sequences between groups (indicated by the **--metadata_field** flag) by inputting a dataframe obtained from ```count_pairs.R```.
 
 ```bash
-scripts/RR_from_df_n_pairs.R \
-    --input_df_pairs_count results/df_n_pairs_by_region.tsv \
-    --metadata_field region \
-    --output_df_RR results/df_RR_by_region.tsv
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/RR_from_df_n_pairs.R \
+  --input_df_pairs_count /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_n_pairs_by_region.tsv \
+  --metadata_field region \
+  --output_df_RR /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_RR_by_region.tsv
 ```
 
 ### 6. Compute uncertainty around RR using a resampling approach
@@ -227,14 +227,14 @@ The output has the following format:
 
 
 ```bash
-scripts/uncertainty_RR.R \
-    --input_df_id_seq results/df_pairs_id_seq.tsv \
-    --input_metadata data/synthetic-metadata.tsv \
+/scr/u/dongw21/Chikungunya/chikv_ALL/scripts/uncertainty_RR.R \
+    --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_ALL/results/df_pairs_id_seq.tsv \
+    --input_metadata /scr/u/dongw21/Chikungunya/chikv_ALL/metadata_chikv_strain_country_group.tsv \
     --n_subsamples 1000 \
     --prop_subsample 0.8 \
     --temp_dir temp \
     --metadata_field region \
-    --output_RR_uncertainty results/RR_uncertainty_region.tsv
+    --output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_region.tsv
 ```
 
 Median values along 95% confidence intervals can then be obtained by computing the median and 2.5% and 97.5% quantiles across ```replicate_id``` using a standard data analysis software (R, Python...) or the following ```tsv-summarize``` command: 
@@ -243,5 +243,5 @@ Median values along 95% confidence intervals can then be obtained by computing t
 tsv-summarize -H \
     --group-by region_1,region_2 \
     --quantile RR:0.025,0.5,0.975 \
-    results/RR_uncertainty_region.tsv
+    output_RR_uncertainty /scr/u/dongw21/Chikungunya/chikv_ALL/results/RR_uncertainty_region.tsv
 ```
