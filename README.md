@@ -12,31 +12,36 @@ The environment can be created and activated using the following commands:
 
 ```bash
 awk -F '\t' 'NR==1{
-    # 找三列列号
+    # 找列号
     for(i=1;i<=NF;i++){
         if($i=="strain") s=i
         if($i=="group")  g=i
         if($i=="region") r=i
     }
-    print "strain\tregion\tgroup"
+    # 输出表头
+    print "strain\tcountry\tgroup\tcontinent"
     next
 }
 {
-    region = $r
-    country = region
+    full = $r          # e.g. "Asia / China / Yunnan"
+    country = full
+    continent = full
 
-    # 用 " / " 分割 region
-    n = split(region, a, " / ")
+    n = split(full, a, " / ")
 
+    if (n >= 1) {
+        continent = a[1]    # "Asia"
+    }
     if (n >= 2) {
-        # 形如 "Asia / China / Yunnan" -> 取 "China"
-        country = a[2]
+        country = a[2]      # "China"
     } else if (n == 1) {
         country = a[1]
     }
 
-    print $s "\t" country "\t" $g
-}' metadata_chikv_rr.tsv > metadata_chikv_strain_country_group.tsv
+    print $s "\t" country "\t" $g "\t" continent
+}' metadata_chikv_rr.tsv > metadata_chikv_strain_country_group_continent.tsv
+
+
 
 
 ```
