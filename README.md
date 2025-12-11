@@ -10,8 +10,36 @@ We use conda to define an environment containing all the required depencencies.
 We can then use conda to install the required dependencies.
 The environment can be created and activated using the following commands:
 
+```bash
+awk -F '\t' 'NR==1{
+    # 找三列列号
+    for(i=1;i<=NF;i++){
+        if($i=="strain") s=i
+        if($i=="group")  g=i
+        if($i=="region") r=i
+    }
+    print "strain\tregion\tgroup"
+    next
+}
+{
+    region = $r
+    country = region
+
+    # 用 " / " 分割 region
+    n = split(region, a, " / ")
+
+    if (n >= 2) {
+        # 形如 "Asia / China / Yunnan" -> 取 "China"
+        country = a[2]
+    } else if (n == 1) {
+        country = a[1]
+    }
+
+    print $s "\t" country "\t" $g
+}' metadata_chikv_rr.tsv > metadata_chikv_strain_country_group.tsv
 
 
+```
 
 ```bash
 awk -F '\t' 'NR==1{
@@ -119,13 +147,13 @@ conda env remove --name idseq
 # 重新写入正确的表头（注意 -e）
 echo -e "strain_1\t strain_1\tn_mutations" > results/df_genetic_distance.tsv
 # 追加 pairsnp 的输出
-pairsnp -s /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta >> results/df_genetic_distance.tsv
+pairsnp -s /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta >> /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_genetic_distance.tsv
 ```
 
 ### 2. Downsampling the distance matrix only to pairs of identical sequences
 [**tsv-filter**](https://github.com/eBay/tsv-utils/tree/master/tsv-filter) can be used to only keep pairs of sequences that are identical.
 ```bash
-tsv-filter -H --eq n_mutations:0 "results/df_genetic_distance.tsv" > "results/df_pairs_id_seq.tsv"
+tsv-filter -H --eq n_mutations:0 "/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_genetic_distance.tsv" > "/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq.tsv"
 ```
 
 Another option would have been to directly add the flag ```-t 0``` in the ```pairsnp``` command to only save pairs of sequences that are identical.
@@ -149,11 +177,11 @@ A typical valid metadata file should have the following structure:
 ... |
 
 ```bash
-scripts/append_metadata_field.R \
-    --input_metadata /scr/u/dongw21/Chikungunya/metadata_chikv_rr.tsv\
+/scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/scripts/append_metadata_field.R \
+    --input_metadata /scr/u/dongw21/Chikungunya/metadata_chikv_strain_country_group.tsv\
     --input_df_id_seq /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq.tsv \
     --output /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/results/df_pairs_id_seq_with_metadata.tsv \
-    --metadata_field group region       
+    --metadata_field region group      
 ```
 
 ### 4. Generating a dataframe with counts of pairs of identical sequences by group
