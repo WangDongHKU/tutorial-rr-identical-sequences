@@ -22,7 +22,47 @@ awk '/^>/{                     # 如果是 header 行
 ' /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_I_WestAfrica/chikv_I_WestAfrica_aln1.fasta
 ```
 
+```bash
 
+awk '/^>/{                     # 如果是 header 行
+        split($0, a, "|");     # 按 | 拆分
+        # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
+        split(a[2], b, ">"); 
+        print ">" b[length(b)] # 打印新的 header：>EPI_ISL_XXXX
+        next
+     }
+     { print }                 # 非 header 行直接输出（序列）
+' /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_III_Asian/chikv_III_Asian_aln.fasta
+```
+
+
+```bash
+
+awk '/^>/{                     # 如果是 header 行
+        split($0, a, "|");     # 按 | 拆分
+        # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
+        split(a[2], b, ">"); 
+        print ">" b[length(b)] # 打印新的 header：>EPI_ISL_XXXX
+        next
+     }
+     { print }                 # 非 header 行直接输出（序列）
+' /scr/u/dongw21/Chikungunya/chikv_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_aln.fasta
+```
+
+
+
+```bash
+
+awk '/^>/{                     # 如果是 header 行
+        split($0, a, "|");     # 按 | 拆分
+        # a[2] 是第二段（EPI_ISL_XXXX），去掉前面的 '>'
+        split(a[2], b, ">"); 
+        print ">" b[length(b)] # 打印新的 header：>EPI_ISL_XXXX
+        next
+     }
+     { print }                 # 非 header 行直接输出（序列）
+' /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta > /scr/u/dongw21/Chikungunya/chikv_II_ECSA_aln.fasta
+```
 
 
 ```bash
